@@ -19,8 +19,6 @@ class AuthTicketResponseHandler extends ResponseHandler
      * Extract an auth ticket from the response.
      *
      * @throws ResponseMissingAuthTicket If auth ticket cannot be determined
-     *
-     * @return string Valid auth ticket
      */
     public function getTicket(): string
     {
