@@ -303,7 +303,6 @@ class Provider extends Category implements ProviderInterface
         // List of accepted response content types
         $accepted = [
             'application/json',
-            'application/ld+json',
             'text/html',
             'text/plain',
             'application/x-www-form-urlencoded',
