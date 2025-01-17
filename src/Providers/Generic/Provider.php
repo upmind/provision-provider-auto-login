@@ -54,9 +54,7 @@ class Provider extends Category implements ProviderInterface
         $options = [];
 
         if ($this->configuration->access_token) {
-            $options[RequestOptions::HEADERS] = [
-                'Authorization' => sprintf('Bearer %s', $this->configuration->access_token),
-            ];
+            $options[RequestOptions::HEADERS]['Authorization'] = sprintf('Bearer %s', $this->configuration->access_token);
         }
 
         $requestParams = $params->toArray();
