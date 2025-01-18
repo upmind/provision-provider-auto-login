@@ -2,6 +2,10 @@
 
 All notable changes to the package will be documented in this file.
 
+## [v5.1.8](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.8) - 2025-12-18
+
+- Add Accept header to Generic provider requests
+
 ## [v5.1.7](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.7) - 2024-10-17
 
 - Add optional `extra` array to CreateResult
