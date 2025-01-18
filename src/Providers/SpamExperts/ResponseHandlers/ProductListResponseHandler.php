@@ -47,7 +47,7 @@ class ProductListResponseHandler extends ResponseHandler
     /**
      * Determine whether the given product list is valid.
      *
-     * @param string[]|null $productList
+     * @param array|null $productList
      *
      * @return bool
      */

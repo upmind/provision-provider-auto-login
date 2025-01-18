@@ -54,9 +54,7 @@ class Provider extends Category implements ProviderInterface
         $options = [];
 
         if ($this->configuration->access_token) {
-            $options[RequestOptions::HEADERS] = [
-                'Authorization' => sprintf('Bearer %s', $this->configuration->access_token),
-            ];
+            $options[RequestOptions::HEADERS]['Authorization'] = sprintf('Bearer %s', $this->configuration->access_token);
         }
 
         $requestParams = $params->toArray();
@@ -318,10 +316,18 @@ class Provider extends Category implements ProviderInterface
         ];
 
         if ($this->configuration->access_token) {
-            $options[RequestOptions::HEADERS] = [
-                'Authorization' => sprintf('Bearer %s', $this->configuration->access_token),
-            ];
+            $options[RequestOptions::HEADERS]['Authorization'] = sprintf('Bearer %s', $this->configuration->access_token);
         }
+
+        // List of accepted response content types
+        $accepted = [
+            'application/json',
+            'text/html',
+            'text/plain',
+            'application/x-www-form-urlencoded',
+        ];
+
+        $options[RequestOptions::HEADERS]['Accept'] = implode(', ', $accepted);
 
         if ($this->configuration->skip_ssl_verification !== null) {
             $options[RequestOptions::VERIFY] = !$this->configuration->skip_ssl_verification;
