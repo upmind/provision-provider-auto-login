@@ -2,6 +2,10 @@
 
 All notable changes to the package will be documented in this file.
 
+## [v5.3.2](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.3.2) - 2025-12-18
+
+- Add Accept header to Generic provider requests
+
 ## [v5.3.1](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.3.1) - 2024-10-17
 
 - Add optional `extra` array to CreateResult
@@ -26,6 +30,10 @@ All notable changes to the package will be documented in this file.
 
 - Update for PHP 8.1+ and base library v4
 - Add static analyser and docker environment
+
+## [v5.1.7](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.7) - 2025-12-18
+
+- Add Accept header to Generic provider requests
 
 ## [v5.1.7](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.7) - 2024-10-17
 
