@@ -31,7 +31,7 @@ All notable changes to the package will be documented in this file.
 - Update for PHP 8.1+ and base library v4
 - Add static analyser and docker environment
 
-## [v5.1.7](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.7) - 2025-12-18
+## [v5.1.8](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.8) - 2025-12-18
 
 - Add Accept header to Generic provider requests
 
