@@ -9,6 +9,8 @@ use Upmind\ProvisionBase\Provider\Contract\ProviderInterface;
 use Upmind\ProvisionBase\Provider\DataSet\AboutData;
 use Upmind\ProvisionProviders\AutoLogin\Category;
 use Upmind\ProvisionProviders\AutoLogin\Data\AccountIdentifierParams;
+use Upmind\ProvisionProviders\AutoLogin\Data\ChangePackageParams;
+use Upmind\ProvisionProviders\AutoLogin\Data\ChangePackageResult;
 use Upmind\ProvisionProviders\AutoLogin\Data\CreateParams;
 use Upmind\ProvisionProviders\AutoLogin\Data\CreateResult;
 use Upmind\ProvisionProviders\AutoLogin\Data\EmptyResult;
@@ -79,11 +81,12 @@ class Provider extends Category implements ProviderInterface
 
     /**
      * @inheritDoc
+     *
+     * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
      */
-    public function changePackage(AccountIdentifierParams $params): EmptyResult
+    public function changePackage(ChangePackageParams $params): ChangePackageResult
     {
-        return EmptyResult::create()
-            ->setMessage('Account unsuspended');
+        $this->errorResult('Not Implemented');
     }
 
     /**

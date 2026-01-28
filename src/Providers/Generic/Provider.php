@@ -11,6 +11,8 @@ use Upmind\ProvisionBase\Provider\Contract\ProviderInterface;
 use Upmind\ProvisionBase\Provider\DataSet\AboutData;
 use Upmind\ProvisionProviders\AutoLogin\Category;
 use Upmind\ProvisionProviders\AutoLogin\Data\AccountIdentifierParams;
+use Upmind\ProvisionProviders\AutoLogin\Data\ChangePackageParams;
+use Upmind\ProvisionProviders\AutoLogin\Data\ChangePackageResult;
 use Upmind\ProvisionProviders\AutoLogin\Data\CreateParams;
 use Upmind\ProvisionProviders\AutoLogin\Data\CreateResult;
 use Upmind\ProvisionProviders\AutoLogin\Data\EmptyResult;
@@ -169,7 +171,7 @@ class Provider extends Category implements ProviderInterface
      * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
      * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\OperationFailed
      */
-    public function changePackage(AccountIdentifierParams $params): EmptyResult
+    public function changePackage(ChangePackageParams $params): ChangePackageResult
     {
         if (!$this->configuration->has_change_package) {
             $this->errorResult('No changePackage endpoint set in this configuration');
@@ -196,7 +198,11 @@ class Provider extends Category implements ProviderInterface
         $handler = new OperationResponseHandler($response);
         $handler->assertOperationSuccess('change package');
 
-        return EmptyResult::create()->setMessage('Account package changed');
+        return ChangePackageResult::create()
+            ->setUsername($params->username)
+            ->setServiceIdentifier($params->service_identifier)
+            ->setPackageIdentifier($params->package_identifier)
+            ->setMessage('Account package changed');
     }
 
     /**
