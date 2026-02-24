@@ -18,10 +18,10 @@ class ChangePackageResult extends ResultData
     public static function rules(): Rules
     {
         return new Rules([
-		'username' => ['filled'],
-		'service_identifier' => ['nullable', 'string'],
-		'package_identifier' => ['nullable', 'string'],
-		'extra' => ['nullable', 'array'],
+            'username' => ['filled'],
+            'service_identifier' => ['nullable', 'string'],
+            'package_identifier' => ['nullable', 'string'],
+            'extra' => ['nullable', 'array'],
         ]);
     }
 
