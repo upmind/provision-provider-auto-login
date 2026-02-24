@@ -2,6 +2,11 @@
 
 All notable changes to the package will be documented in this file.
 
+## [v5.1.9](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.9) - 2026-02-24
+
+- Update changePackage() function to return ChangePackageResult
+- Drop support for upmind/provision-provider-base v2.0
+
 ## [v5.1.8](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.8) - 2025-12-18
 
 - Add Accept header to Generic provider requests

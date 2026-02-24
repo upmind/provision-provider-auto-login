@@ -7,6 +7,8 @@ namespace Upmind\ProvisionProviders\AutoLogin;
 use Upmind\ProvisionBase\Provider\BaseCategory;
 use Upmind\ProvisionBase\Provider\DataSet\AboutData;
 use Upmind\ProvisionProviders\AutoLogin\Data\AccountIdentifierParams;
+use Upmind\ProvisionProviders\AutoLogin\Data\ChangePackageParams;
+use Upmind\ProvisionProviders\AutoLogin\Data\ChangePackageResult;
 use Upmind\ProvisionProviders\AutoLogin\Data\CreateParams;
 use Upmind\ProvisionProviders\AutoLogin\Data\CreateResult;
 use Upmind\ProvisionProviders\AutoLogin\Data\EmptyResult;
@@ -51,7 +53,7 @@ abstract class Category extends BaseCategory
     /**
      * Change the package of an account.
      */
-    abstract public function changePackage(AccountIdentifierParams $params): EmptyResult;
+    abstract public function changePackage(ChangePackageParams $params): ChangePackageResult;
 
     /**
      * Renew an account's service.

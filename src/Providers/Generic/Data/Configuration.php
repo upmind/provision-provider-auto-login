@@ -11,24 +11,24 @@ use Upmind\ProvisionBase\Provider\DataSet\Rules;
  * @property-read string|null $access_token Access bearer token to send in requests
  * @property-read string $login_endpoint_url Endpoint which generates login URLs
  * @property-read string|null $login_endpoint_http_method HTTP method to use for the login endpoint
- * @property-read boolean $has_create Whether or not this configuration has a create endpoint
+ * @property-read boolean|null $has_create Whether or not this configuration has a create endpoint
  * @property-read string|null $create_endpoint_url Endpoint which creates a service account and returns a username
  * @property-read string|null $create_endpoint_http_method HTTP method to use for the create endpoint
- * @property-read boolean $has_suspend Whether or not this configuration has suspend + unsuspend endpoints
+ * @property-read boolean|null $has_suspend Whether or not this configuration has suspend + unsuspend endpoints
  * @property-read string|null $suspend_endpoint_url Endpoint which suspends a service account
  * @property-read string|null $suspend_endpoint_http_method HTTP method to use for the suspend endpoint
  * @property-read string|null $unsuspend_endpoint_url Endpoint which unsuspends a service account
  * @property-read string|null $unsuspend_endpoint_http_method HTTP method to use for the unsuspend endpoint
- * @property-read boolean $has_change_package Whether or not this configuration has a change package endpoint
+ * @property-read boolean|null $has_change_package Whether or not this configuration has a change package endpoint
  * @property-read string|null $change_package_endpoint_url Endpoint which changes the package of a service account
  * @property-read string|null $change_package_endpoint_http_method HTTP method to use for the change package endpoint
- * @property-read boolean $has_renew Whether or not this configuration has a renew endpoint
+ * @property-read boolean|null $has_renew Whether or not this configuration has a renew endpoint
  * @property-read string|null $renew_endpoint_url Endpoint which renews a service account
  * @property-read string|null $renew_endpoint_http_method HTTP method to use for the renew endpoint
- * @property-read boolean $has_terminate Whether or not this configuration has a terminate endpoint
+ * @property-read boolean|null $has_terminate Whether or not this configuration has a terminate endpoint
  * @property-read string|null $terminate_endpoint_url Endpoint which terminates a service account
  * @property-read string|null $terminate_endpoint_http_method HTTP method to use for the terminate endpoint
- * @property-read boolean $skip_ssl_verification Whether or not to allow invalid SSL certificates
+ * @property-read boolean|null $skip_ssl_verification Whether or not to allow invalid SSL certificates
  * @property-read string|null $extra_data_1 Extra data field 1
  * @property-read string|null $extra_data_2 Extra data field 2
  * @property-read string|null $extra_data_3 Extra data field 3
