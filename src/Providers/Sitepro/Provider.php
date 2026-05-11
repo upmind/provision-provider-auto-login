@@ -85,7 +85,7 @@ class Provider extends Category implements ProviderInterface
         $this->errorResult('Not Implemented');
     }
 
-    public function changePackage(AccountIdentifierParams $params): EmptyResult
+    public function changePackage(ChangePackageParams $params): ChangePackageResult
     {
         $this->errorResult('Not Implemented');
     }
