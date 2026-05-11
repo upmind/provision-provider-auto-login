@@ -9,6 +9,7 @@ use Upmind\ProvisionProviders\AutoLogin\Providers\Example\Provider as ExamplePro
 use Upmind\ProvisionProviders\AutoLogin\Providers\Generic\Provider as GenericProvider;
 use Upmind\ProvisionProviders\AutoLogin\Providers\SpamExperts\Provider as SpamExpertsProvider;
 use Upmind\ProvisionProviders\AutoLogin\Providers\SafeWeb\Provider as SafeWebProvider;
+use Upmind\ProvisionProviders\AutoLogin\Providers\SitePro\Provider as SiteproProvider;
 
 class LaravelServiceProvider extends ProvisionServiceProvider
 {
@@ -21,5 +22,6 @@ class LaravelServiceProvider extends ProvisionServiceProvider
         $this->bindProvider('auto-login', 'generic', GenericProvider::class);
         $this->bindProvider('auto-login', 'spam-experts', SpamExpertsProvider::class);
         $this->bindProvider('auto-login', 'safe-web', SafeWebProvider::class);
+        $this->bindProvider('auto-login', 'sitepro', SiteproProvider::class);
     }
 }
