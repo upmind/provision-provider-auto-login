@@ -94,11 +94,22 @@ class Provider extends Category implements ProviderInterface
     }
 
     /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
+     * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
      */
     public function login(AccountIdentifierParams $params): LoginResult
     {
-        $this->errorResult('Operation not supported');
+        $customerId = $params->service_identifier ?: $params->username;
+
+        $response = $this->client()->post("/api/v1/integrations/customer/{$customerId}/magic-link");
+
+        $handler = new ResponseHandler($response);
+        $handler->assertSuccess();
+
+        $loginUrl = $handler->getData('url');
+
+        return LoginResult::create()->setUrl($loginUrl);
     }
 
     /**
