@@ -64,6 +64,7 @@ class Provider extends Category implements ProviderInterface
             'billedFromDate' => $billedFromDate,
             'currencyCode' => $this->configuration->currency_code,
             'planType' => $planType,
+            'platformAccess' => true,
         ];
 
         if (!empty($params->extra['assetsDomains'])) {
@@ -102,7 +103,7 @@ class Provider extends Category implements ProviderInterface
     {
         $customerId = $params->service_identifier ?: $params->username;
 
-        $response = $this->client()->post("/api/v1/integrations/customer/{$customerId}/magic-link");
+        $response = $this->client()->post("/api/integrations/customer/{$customerId}/magic-link");
 
         $handler = new ResponseHandler($response);
         $handler->assertSuccess();
