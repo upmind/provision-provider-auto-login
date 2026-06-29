@@ -114,7 +114,9 @@ class Provider extends Category implements ProviderInterface
     }
 
     /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
+     * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
      */
     public function suspend(AccountIdentifierParams $params): EmptyResult
     {
@@ -133,11 +135,24 @@ class Provider extends Category implements ProviderInterface
     }
 
     /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
+     * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
      */
     public function unsuspend(AccountIdentifierParams $params): EmptyResult
     {
-        $this->errorResult('Operation not supported');
+        $customerId = $params->service_identifier ?: $params->username;
+
+        $response = $this->client()->post('/api/integrations/customer/reactivate', [
+            RequestOptions::JSON => [
+                'customerId' => $customerId,
+            ],
+        ]);
+
+        $handler = new ResponseHandler($response);
+        $handler->assertSuccess();
+
+        return EmptyResult::create();
     }
 
     /**
@@ -179,11 +194,23 @@ class Provider extends Category implements ProviderInterface
 
     /**
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
      * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
      */
     public function terminate(AccountIdentifierParams $params): EmptyResult
     {
-        return $this->suspend($params);
+        $customerId = $params->service_identifier ?: $params->username;
+
+        $response = $this->client()->post('/api/integrations/customer/offboard', [
+            RequestOptions::JSON => [
+                'customerId' => $customerId,
+            ],
+        ]);
+
+        $handler = new ResponseHandler($response);
+        $handler->assertSuccess();
+
+        return EmptyResult::create();
     }
 
     protected function getBaseUrl(): string
