@@ -184,12 +184,9 @@ class Provider extends Category implements ProviderInterface
             ->setPackageIdentifier($planType);
     }
 
-    /**
-     * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
-     */
     public function renew(AccountIdentifierParams $params): EmptyResult
     {
-        $this->errorResult('Operation not supported');
+        return EmptyResult::create();
     }
 
     /**
