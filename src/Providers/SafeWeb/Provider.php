@@ -127,14 +127,7 @@ class Provider extends Category implements ProviderInterface
     {
         $customerId = $params->service_identifier ?: $params->username;
 
-        $response = $this->client()->post('/api/integrations/customer/offboard', [
-            RequestOptions::JSON => [
-                'customerId' => $customerId,
-            ],
-        ]);
-
-        $handler = new ResponseHandler($response);
-        $handler->assertSuccess();
+        $this->offBoardCustomer($customerId);
 
         return EmptyResult::create();
     }
@@ -206,14 +199,7 @@ class Provider extends Category implements ProviderInterface
     {
         $customerId = $params->service_identifier ?: $params->username;
 
-        $response = $this->client()->post('/api/integrations/customer/offboard', [
-            RequestOptions::JSON => [
-                'customerId' => $customerId,
-            ],
-        ]);
-
-        $handler = new ResponseHandler($response);
-        $handler->assertSuccess();
+        $this->offBoardCustomer($customerId);
 
         return EmptyResult::create();
     }
@@ -302,5 +288,22 @@ class Provider extends Category implements ProviderInterface
         }
 
         return $data['data'];
+    }
+
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
+     * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
+     */
+    private function offBoardCustomer(string $customerId): void
+    {
+        $response = $this->client()->post('/api/integrations/customer/offboard', [
+            RequestOptions::JSON => [
+                'customerId' => $customerId,
+            ],
+        ]);
+
+        $handler = new ResponseHandler($response);
+        $handler->assertSuccess();
     }
 }
