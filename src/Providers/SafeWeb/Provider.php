@@ -7,6 +7,7 @@ namespace Upmind\ProvisionProviders\AutoLogin\Providers\SafeWeb;
 use DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Str;
 use Upmind\ProvisionBase\Provider\Contract\ProviderInterface;
 use Upmind\ProvisionBase\Provider\DataSet\AboutData;
 use Upmind\ProvisionProviders\AutoLogin\Category;
@@ -23,6 +24,7 @@ use Upmind\ProvisionProviders\AutoLogin\Providers\SafeWeb\ResponseHandlers\Respo
 class Provider extends Category implements ProviderInterface
 {
     protected Configuration $configuration;
+    private ?Client $client = null;
 
     public static function aboutProvider(): AboutData
     {
@@ -53,6 +55,9 @@ class Provider extends Category implements ProviderInterface
         $email = $params->email;
         $planType = $params->package_identifier ?? 'safeweb-basic';
 
+        // Get Plan UUID, also checks if type/uuid is valid.
+        $planUuid = $this->getPlanUuid($planType);
+
         $billedFromDate = (new DateTime('+1 month', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z');
 
         $body = [
@@ -63,7 +68,7 @@ class Provider extends Category implements ProviderInterface
             'price' => $params->extra['price'] ?? 0,
             'billedFromDate' => $billedFromDate,
             'currencyCode' => $this->configuration->currency_code,
-            'planType' => $planType,
+            'planUuid' => $planUuid,
             'platformAccess' => true,
         ];
 
@@ -170,9 +175,12 @@ class Provider extends Category implements ProviderInterface
             $this->errorResult('Package identifier (plan type) is required');
         }
 
+        // Get Plan UUID, also checks if type/uuid is valid.
+        $planUuid = $this->getPlanUuid($planType);
+
         $response = $this->client()->patch("/api/integrations/customer/{$customerId}/info", [
             RequestOptions::JSON => [
-                'planType' => $planType,
+                'planUuid' => $planUuid,
             ],
         ]);
 
@@ -212,14 +220,18 @@ class Provider extends Category implements ProviderInterface
 
     protected function getBaseUrl(): string
     {
-        return $this->configuration->sandbox
+        return $this->configuration->isSandbox()
             ? 'https://staging-connect.safeweb.co'
             : 'https://connect.safeweb.co';
     }
 
     protected function client(): Client
     {
-        return new Client([
+        if ($this->client !== null) {
+            return $this->client;
+        }
+
+       $this->client = new Client([
             'base_uri' => $this->getBaseUrl(),
             RequestOptions::HEADERS => [
                 'SW-PARTNER-ID' => $this->configuration->partner_id,
@@ -229,5 +241,66 @@ class Provider extends Category implements ProviderInterface
             RequestOptions::HTTP_ERRORS => false,
             'handler' => $this->getGuzzleHandlerStack(),
         ]);
+
+        return $this->client;
+    }
+
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
+     * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
+     */
+    private function getPlanUuid(string $planType): string
+    {
+        $plans = $this->getPartnerPlans();
+
+        foreach ($plans as $plan) {
+            // Skip inactive plans
+            if ($plan['status'] !== 'active') {
+                continue;
+            }
+
+            if ($plan['planType'] === $planType || $plan['uuid'] === $planType) {
+                return $plan['uuid'];
+            }
+        }
+
+        $this->errorResult('Package identifier (plan type) is not valid');
+    }
+
+    /**
+     * @return array{
+     *     array{
+     *         uuid: string,
+     *         displayName: string,
+     *         features: array{
+     *             feature_name: string,
+     *         },
+     *         isSystemDefault: bool,
+     *         planType: string,
+     *         status: string,
+     *         allowsInsurance: bool
+     *     }
+     * }
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
+     * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
+     */
+    private function getPartnerPlans(): array
+    {
+        $response = $this->client()->get('/api/integrations/partner/plans');
+
+        $handler = new ResponseHandler($response);
+
+        $handler->assertSuccess();
+
+        $data = $handler->getData();
+
+        if (empty($data['data'])) {
+            $this->errorResult('No available plans found');
+        }
+
+        return $data['data'];
     }
 }
