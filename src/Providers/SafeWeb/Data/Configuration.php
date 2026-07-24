@@ -24,4 +24,9 @@ class Configuration extends DataSet
             'sandbox' => ['nullable', 'boolean'],
         ]);
     }
+
+    public function isSandbox(): bool
+    {
+        return (bool) $this->sandbox;
+    }
 }
