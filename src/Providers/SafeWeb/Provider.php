@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Upmind\ProvisionProviders\AutoLogin\Providers\SafeWeb;
 
-use DateTime;
+use DateTimeZone;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
-use Illuminate\Support\Str;
+use DateTimeImmutable;
 use Upmind\ProvisionBase\Provider\Contract\ProviderInterface;
 use Upmind\ProvisionBase\Provider\DataSet\AboutData;
 use Upmind\ProvisionProviders\AutoLogin\Category;
@@ -21,6 +22,11 @@ use Upmind\ProvisionProviders\AutoLogin\Data\LoginResult;
 use Upmind\ProvisionProviders\AutoLogin\Providers\SafeWeb\Data\Configuration;
 use Upmind\ProvisionProviders\AutoLogin\Providers\SafeWeb\ResponseHandlers\ResponseHandler;
 
+/**
+ * SafeWeb Login Provider
+ *
+ * It currently supports monitoring for a single email or domain.
+ */
 class Provider extends Category implements ProviderInterface
 {
     protected Configuration $configuration;
@@ -50,7 +56,11 @@ class Provider extends Category implements ProviderInterface
             $this->errorResult('Customer email is required');
         }
 
-        $customerReference = (string)$params->user_id;
+        if (empty($params->service_identifier)) {
+            $this->errorResult('Service identifier (domain or email) is required');
+        }
+
+        $customerReference = (string) $params->user_id;
         $companyName = $params->customer_name ?? $customerReference;
         $email = $params->email;
         $planType = $params->package_identifier ?? 'safeweb-basic';
@@ -58,35 +68,40 @@ class Provider extends Category implements ProviderInterface
         // Get Plan UUID, also checks if type/uuid is valid.
         $planUuid = $this->getPlanUuid($planType);
 
-        $billedFromDate = (new DateTime('+1 month', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z');
+        // Bill date should be current date in UTC + 1 minute.
+        $billedFromDate = new DateTimeImmutable('+5 minute', new DateTimeZone('UTC'));
 
         $body = [
             'companyName' => $companyName,
             'contactEmail' => $email,
             'customerReference' => $customerReference,
             'alertRecipients' => [$email],
-            'price' => $params->extra['price'] ?? 0,
-            'billedFromDate' => $billedFromDate,
-            'currencyCode' => $this->configuration->currency_code,
+            'price' => isset($params->billing->amount) ? (float) $params->billing->amount : 0.0,
+            'currencyCode' => $params->billing->currency ?? $this->configuration->currency_code,
+            'billedFromDate' => $billedFromDate->format('Y-m-d\TH:i:s.v\Z'),
             'planUuid' => $planUuid,
             'platformAccess' => true,
         ];
 
-        if (!empty($params->extra['assetsDomains'])) {
-            $body['assetsDomains'] = (array)$params->extra['assetsDomains'];
+        // We expect either an email or a domain. If invalid domain, allow failing from the API.
+        if ($this->isValidEmail($params->service_identifier)) {
+            $body['assetsEmails'] = [$params->service_identifier];
+        } else {
+            $body['assetsDomains'] = [$params->service_identifier];
         }
 
-        if (!empty($params->extra['assetsEmails'])) {
-            $body['assetsEmails'] = (array)$params->extra['assetsEmails'];
+        try {
+            $response = $this->client()->post('/api/integrations/customer/onboard', [
+                RequestOptions::JSON => $body,
+            ]);
+        } catch (RequestException $ex) {
+            $this->errorResult(
+                'Failed to create account for: ' . $params->service_identifier,
+                [],
+                [],
+                $ex
+            );
         }
-
-        if (empty($body['assetsDomains']) && empty($body['assetsEmails'])) {
-            $body['assetsEmails'] = [$email];
-        }
-
-        $response = $this->client()->post('/api/integrations/customer/onboard', [
-            RequestOptions::JSON => $body,
-        ]);
 
         $handler = new ResponseHandler($response);
         $handler->assertSuccess();
@@ -94,8 +109,8 @@ class Provider extends Category implements ProviderInterface
         $customerId = $handler->getData('customerId');
 
         return CreateResult::create()
-            ->setUsername($customerReference)
-            ->setServiceIdentifier($customerId)
+            ->setUsername($customerId)
+            ->setServiceIdentifier($params->service_identifier)
             ->setPackageIdentifier($planType);
     }
 
@@ -106,9 +121,18 @@ class Provider extends Category implements ProviderInterface
      */
     public function login(AccountIdentifierParams $params): LoginResult
     {
-        $customerId = $params->service_identifier ?: $params->username;
+        $customerId = $params->username;
 
-        $response = $this->client()->post("/api/integrations/customer/{$customerId}/magic-link");
+        try {
+            $response = $this->client()->post("/api/integrations/customer/{$customerId}/magic-link");
+        } catch (RequestException $ex) {
+            $this->errorResult(
+                'Failed to generate login URL for account: ' . $customerId,
+                [],
+                [],
+                $ex
+            );
+        }
 
         $handler = new ResponseHandler($response);
         $handler->assertSuccess();
@@ -125,9 +149,18 @@ class Provider extends Category implements ProviderInterface
      */
     public function suspend(AccountIdentifierParams $params): EmptyResult
     {
-        $customerId = $params->service_identifier ?: $params->username;
+        $customerId = $params->username;
 
-        $this->offBoardCustomer($customerId);
+        try {
+            $this->offBoardCustomer($customerId);
+        } catch (RequestException $ex) {
+            $this->errorResult(
+                'Failed to suspend account: ' . $customerId,
+                [],
+                [],
+                $ex
+            );
+        }
 
         return EmptyResult::create();
     }
@@ -139,13 +172,22 @@ class Provider extends Category implements ProviderInterface
      */
     public function unsuspend(AccountIdentifierParams $params): EmptyResult
     {
-        $customerId = $params->service_identifier ?: $params->username;
+        $customerId = $params->username;
 
-        $response = $this->client()->post('/api/integrations/customer/reactivate', [
-            RequestOptions::JSON => [
-                'customerId' => $customerId,
-            ],
-        ]);
+        try {
+            $response = $this->client()->post('/api/integrations/customer/reactivate', [
+                RequestOptions::JSON => [
+                    'customerId' => $customerId,
+                ],
+            ]);
+        } catch (RequestException $ex) {
+            $this->errorResult(
+                'Failed to unsuspend account: ' . $customerId,
+                [],
+                [],
+                $ex
+            );
+        }
 
         $handler = new ResponseHandler($response);
         $handler->assertSuccess();
@@ -160,7 +202,7 @@ class Provider extends Category implements ProviderInterface
      */
     public function changePackage(ChangePackageParams $params): ChangePackageResult
     {
-        $customerId = $params->service_identifier ?: $params->username;
+        $customerId = $params->username;
 
         $planType = $params->package_identifier;
 
@@ -171,11 +213,20 @@ class Provider extends Category implements ProviderInterface
         // Get Plan UUID, also checks if type/uuid is valid.
         $planUuid = $this->getPlanUuid($planType);
 
-        $response = $this->client()->patch("/api/integrations/customer/{$customerId}/info", [
-            RequestOptions::JSON => [
-                'planUuid' => $planUuid,
-            ],
-        ]);
+        try {
+            $response = $this->client()->patch("/api/integrations/customer/{$customerId}/info", [
+                RequestOptions::JSON => [
+                    'planUuid' => $planUuid,
+                ],
+            ]);
+        } catch (RequestException $ex) {
+            $this->errorResult(
+                'Failed to  change package (plan) for account: ' . $customerId,
+                ['package_identifier' => $planType],
+                [],
+                $ex
+            );
+        }
 
         $handler = new ResponseHandler($response);
         $handler->assertSuccess();
@@ -197,9 +248,18 @@ class Provider extends Category implements ProviderInterface
      */
     public function terminate(AccountIdentifierParams $params): EmptyResult
     {
-        $customerId = $params->service_identifier ?: $params->username;
+        $customerId = $params->username;
 
-        $this->offBoardCustomer($customerId);
+        try {
+            $this->offBoardCustomer($customerId);
+        } catch (RequestException $ex) {
+            $this->errorResult(
+                'Failed to terminate account: ' . $customerId,
+                [],
+                [],
+                $ex
+            );
+        }
 
         return EmptyResult::create();
     }
@@ -251,7 +311,7 @@ class Provider extends Category implements ProviderInterface
             }
         }
 
-        $this->errorResult('Package identifier (plan type) is not valid');
+        $this->errorResult(sprintf('Package identifier (plan type) `%s` is not valid', $planType));
     }
 
     /**
@@ -305,5 +365,10 @@ class Provider extends Category implements ProviderInterface
 
         $handler = new ResponseHandler($response);
         $handler->assertSuccess();
+    }
+
+    private function isValidEmail(string $email): bool
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 }
