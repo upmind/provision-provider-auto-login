@@ -37,7 +37,7 @@ class Provider extends Category implements ProviderInterface
         return AboutData::create()
             ->setName('SafeWeb')
             ->setDescription('Manage SafeWeb dark web monitoring accounts.')
-            ->setLogoUrl('https://api.upmind.io/images/logos/provision/safeweb-logo_2x.png');
+            ->setLogoUrl('https://api.upmind.io/images/logos/provision/safeweb-logo.png');
     }
 
     public function __construct(Configuration $configuration)
