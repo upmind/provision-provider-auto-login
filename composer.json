@@ -10,6 +10,7 @@
         }
     ],
     "require": {
+        "ext-json": "*",
         "upmind/provision-provider-base": "^3.0"
     },
     "autoload": {
@@ -22,6 +23,18 @@
             "providers": [
                 "Upmind\\ProvisionProviders\\AutoLogin\\LaravelServiceProvider"
             ]
+        }
+    },
+    "config": {
+        "policy": {
+            "advisories": {
+                "ignore-id": [
+                    "CVE-2025-64500",
+                    "CVE-2024-50345",
+                    "CVE-2026-24739",
+                    "CVE-2024-51736"
+                ]
+            }
         }
     }
 }

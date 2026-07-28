@@ -14,6 +14,7 @@ use Upmind\ProvisionBase\Provider\DataSet\Rules;
  * @property-read string|null $email Email address of the customer
  * @property-read string|null $customer_name Name of the customer
  * @property-read string[]|null $promo_codes Optional array of promo codes applied to the order
+ * @property-read BillingParams|null $billing Billing metadata
  * @property-read mixed[]|null $extra Any extra data to pass to the service endpoint
  */
 class CreateParams extends DataSet
@@ -28,6 +29,7 @@ class CreateParams extends DataSet
             'customer_name' => ['nullable', 'string'],
             'promo_codes' => ['nullable', 'array'],
             'promo_codes.*' => ['string'],
+            'billing' => ['nullable', BillingParams::class],
             'extra' => ['nullable', 'array'],
         ]);
     }

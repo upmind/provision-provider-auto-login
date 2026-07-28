@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+
+  #PHP Service
+  provision-provider-auto-login:
+    build:
+      context: .
+      dockerfile: ./.docker/Dockerfile
+    container_name: provision-provider-auto-login
+    tty: true
+    environment:
+      SERVICE_NAME: provision-provider-auto-login
+      SERVICE_TAGS: dev
+    working_dir: /usr/src/lib
+    volumes:
+      - ./:/usr/src/lib
+    networks:
+      - provision-provider-auto-login-network
+
+#Docker Networks
+networks:
+  provision-provider-auto-login-network:
+    driver: bridge
