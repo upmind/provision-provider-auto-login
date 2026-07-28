@@ -29,11 +29,10 @@
         "policy": {
             "advisories": {
                 "ignore-id": [
-                    "KSA-365x-2zjk-pt47",
-                    "PKSA-b35n-565h-rs4q",
-                    "PKSA-t4rz-hp2g-57t1",
-                    "PKSA-9w98-4rwq-spxr",
-                    "PKSA-324d-pqmd-hptz"
+                    "CVE-2025-64500",
+                    "CVE-2024-50345",
+                    "CVE-2026-24739",
+                    "CVE-2024-51736"
                 ]
             }
         }
