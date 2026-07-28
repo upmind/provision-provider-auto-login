@@ -2,7 +2,7 @@
 
 All notable changes to the package will be documented in this file.
 
-## [v5.2.0](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.2.0) - 2026-07-28
+## [v5.1.10](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.10) - 2026-07-28
 
 - Add SafeWeb provider
 
