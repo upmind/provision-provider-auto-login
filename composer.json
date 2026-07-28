@@ -24,5 +24,18 @@
                 "Upmind\\ProvisionProviders\\AutoLogin\\LaravelServiceProvider"
             ]
         }
+    },
+    "config": {
+        "policy": {
+            "advisories": {
+                "ignore-id": [
+                    "KSA-365x-2zjk-pt47",
+                    "PKSA-b35n-565h-rs4q",
+                    "PKSA-t4rz-hp2g-57t1",
+                    "PKSA-9w98-4rwq-spxr",
+                    "KSA-324d-pqmd-hptz",
+                ]
+            }
+        }
     }
 }
