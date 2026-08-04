@@ -65,10 +65,10 @@ class Provider extends Category implements ProviderInterface
         $email = $params->email;
         $planType = $params->package_identifier ?? 'safeweb-basic';
 
-        // Get Plan UUID, also checks if type/uuid is valid.
-        $planUuid = $this->getPlanUuid($planType);
+        // Get Plan ID (UUID), also checks if type/ID is valid.
+        $planId = $this->getPlanId($planType);
 
-        // Bill date should be current date in UTC + 1 minute.
+        // Bill date should be current date in UTC + 5 minute.
         $billedFromDate = new DateTimeImmutable('+5 minute', new DateTimeZone('UTC'));
 
         $body = [
@@ -76,10 +76,10 @@ class Provider extends Category implements ProviderInterface
             'contactEmail' => $email,
             'customerReference' => $customerReference,
             'alertRecipients' => [$email],
-            'price' => isset($params->billing->amount) ? (float) $params->billing->amount : 0.0,
-            'currencyCode' => $params->billing->currency ?? $this->configuration->currency_code,
+            'price' => isset($params->billing, $params->billing->amount) ? (float) $params->billing->amount : 0.0,
+            'currencyCode' => $params->billing->currency ?? 'USD', // fallback to USD if not provided
             'billedFromDate' => $billedFromDate->format('Y-m-d\TH:i:s.v\Z'),
-            'planUuid' => $planUuid,
+            'planId' => $planId,
             'platformAccess' => true,
         ];
 
@@ -204,25 +204,30 @@ class Provider extends Category implements ProviderInterface
     {
         $customerId = $params->username;
 
-        $planType = $params->package_identifier;
-
-        if (empty($planType)) {
+        if (empty($params->package_identifier)) {
             $this->errorResult('Package identifier (plan type) is required');
         }
 
-        // Get Plan UUID, also checks if type/uuid is valid.
-        $planUuid = $this->getPlanUuid($planType);
+        // Get Plan ID (UUID), also checks if type/ID is valid.
+        $planId = $this->getPlanId($params->package_identifier);
+
+        $payload = [
+            'planId' => $planId,
+        ];
+
+        // Add price if available.
+        if (isset($params->billing, $params->billing->amount)) {
+            $payload['price'] = (float) $params->billing->amount;
+        }
 
         try {
             $response = $this->client()->patch("/api/integrations/customer/{$customerId}/info", [
-                RequestOptions::JSON => [
-                    'planUuid' => $planUuid,
-                ],
+                RequestOptions::JSON => $payload,
             ]);
         } catch (RequestException $ex) {
             $this->errorResult(
                 'Failed to  change package (plan) for account: ' . $customerId,
-                ['package_identifier' => $planType],
+                ['package_identifier' => $params->package_identifier],
                 [],
                 $ex
             );
@@ -233,7 +238,8 @@ class Provider extends Category implements ProviderInterface
 
         return ChangePackageResult::create()
             ->setUsername($customerId)
-            ->setPackageIdentifier($planType);
+            ->setServiceIdentifier($params->service_identifier)
+            ->setPackageIdentifier($params->package_identifier);
     }
 
     public function renew(AccountIdentifierParams $params): EmptyResult
@@ -296,7 +302,7 @@ class Provider extends Category implements ProviderInterface
      * @throws \Upmind\ProvisionBase\Exception\ProvisionFunctionError
      * @throws \Upmind\ProvisionProviders\AutoLogin\Exceptions\CannotParseResponse
      */
-    private function getPlanUuid(string $planType): string
+    private function getPlanId(string $planType): string
     {
         $plans = $this->getPartnerPlans();
 
@@ -306,8 +312,9 @@ class Provider extends Category implements ProviderInterface
                 continue;
             }
 
-            if ($plan['planType'] === $planType || $plan['uuid'] === $planType) {
-                return $plan['uuid'];
+            // First match against the ID, otherwise check against legacy Plan Type
+            if ($plan['id'] === $planType || (isset($plan['planType']) && $plan['planType'] === $planType)) {
+                return $plan['id'];
             }
         }
 
@@ -317,13 +324,13 @@ class Provider extends Category implements ProviderInterface
     /**
      * @return array{
      *     array{
-     *         uuid: string,
+     *         id: string,
      *         displayName: string,
      *         features: array{
      *             feature_name: string,
      *         },
      *         isSystemDefault: bool,
-     *         planType: string,
+     *         planType?: string, // deprecated, could be removed in the future
      *         status: string,
      *         allowsInsurance: bool
      *     }
