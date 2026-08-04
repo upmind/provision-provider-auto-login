@@ -2,6 +2,12 @@
 
 All notable changes to the package will be documented in this file.
 
+## [v5.1.11](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.11) - 2026-08-04
+
+- Update SafeWeb, remove `currency_code` configuration, currency be fetched from request billing params
+- Update SafeWeb, introduce `BillingParams` in `ChangePackageParams` to allow fetching price
+- Fix Safeweb, Plan `uuid` property is no longer used in request params or responses and moved to Plan `id`
+
 ## [v5.1.10](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.10) - 2026-07-28
 
 - Add SafeWeb provider
