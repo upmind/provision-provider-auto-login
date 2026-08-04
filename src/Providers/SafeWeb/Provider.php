@@ -330,7 +330,7 @@ class Provider extends Category implements ProviderInterface
      *             feature_name: string,
      *         },
      *         isSystemDefault: bool,
-     *         planType: string,
+     *         planType?: string, // deprecated, could be removed in the future
      *         status: string,
      *         allowsInsurance: bool
      *     }
