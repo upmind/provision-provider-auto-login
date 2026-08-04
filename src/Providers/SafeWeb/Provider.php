@@ -77,7 +77,7 @@ class Provider extends Category implements ProviderInterface
             'customerReference' => $customerReference,
             'alertRecipients' => [$email],
             'price' => isset($params->billing->amount) ? (float) $params->billing->amount : 0.0,
-            'currencyCode' => $params->billing->currency ?? $this->configuration->currency_code,
+            'currencyCode' => $params->billing->currency ?? 'USD', // fallback to USD if not provided
             'billedFromDate' => $billedFromDate->format('Y-m-d\TH:i:s.v\Z'),
             'planId' => $planId,
             'platformAccess' => true,
