@@ -68,7 +68,7 @@ class Provider extends Category implements ProviderInterface
         // Get Plan ID (UUID), also checks if type/ID is valid.
         $planId = $this->getPlanId($planType);
 
-        // Bill date should be current date in UTC + 1 minute.
+        // Bill date should be current date in UTC + 5 minute.
         $billedFromDate = new DateTimeImmutable('+5 minute', new DateTimeZone('UTC'));
 
         $body = [
