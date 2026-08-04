@@ -76,7 +76,7 @@ class Provider extends Category implements ProviderInterface
             'contactEmail' => $email,
             'customerReference' => $customerReference,
             'alertRecipients' => [$email],
-            'price' => isset($params->billing->amount) ? (float) $params->billing->amount : 0.0,
+            'price' => isset($params->billing, $params->billing->amount) ? (float) $params->billing->amount : 0.0,
             'currencyCode' => $params->billing->currency ?? 'USD', // fallback to USD if not provided
             'billedFromDate' => $billedFromDate->format('Y-m-d\TH:i:s.v\Z'),
             'planId' => $planId,
@@ -204,25 +204,30 @@ class Provider extends Category implements ProviderInterface
     {
         $customerId = $params->username;
 
-        $planType = $params->package_identifier;
-
-        if (empty($planType)) {
+        if (empty($params->package_identifier)) {
             $this->errorResult('Package identifier (plan type) is required');
         }
 
         // Get Plan ID (UUID), also checks if type/ID is valid.
-        $planId = $this->getPlanId($planType);
+        $planId = $this->getPlanId($params->package_identifier);
+
+        $payload = [
+            'planId' => $planId,
+        ];
+
+        // Add price if available.
+        if (isset($params->billing, $params->billing->amount)) {
+            $payload['price'] = (float) $params->billing->amount;
+        }
 
         try {
             $response = $this->client()->patch("/api/integrations/customer/{$customerId}/info", [
-                RequestOptions::JSON => [
-                    'planId' => $planId,
-                ],
+                RequestOptions::JSON => $payload,
             ]);
         } catch (RequestException $ex) {
             $this->errorResult(
                 'Failed to  change package (plan) for account: ' . $customerId,
-                ['package_identifier' => $planType],
+                ['package_identifier' => $params->package_identifier],
                 [],
                 $ex
             );
@@ -233,7 +238,8 @@ class Provider extends Category implements ProviderInterface
 
         return ChangePackageResult::create()
             ->setUsername($customerId)
-            ->setPackageIdentifier($planType);
+            ->setServiceIdentifier($params->service_identifier)
+            ->setPackageIdentifier($params->package_identifier);
     }
 
     public function renew(AccountIdentifierParams $params): EmptyResult
