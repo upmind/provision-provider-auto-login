@@ -74,17 +74,23 @@ class Provider extends Category implements ProviderInterface
 
     public function create(CreateParams $params): CreateResult
     {
-        $this->errorResult('Not Implemented');
+        return CreateResult::create()
+            ->setUsername((string) $params->user_id)
+            ->setServiceIdentifier($params->service_identifier)
+            ->setPackageIdentifier($params->package_identifier)
+            ->setExtra($params->extra);
     }
 
     public function suspend(AccountIdentifierParams $params): EmptyResult
     {
-        $this->errorResult('Not Implemented');
+        return EmptyResult::create()
+            ->setMessage('Account suspended');
     }
 
     public function unsuspend(AccountIdentifierParams $params): EmptyResult
     {
-        $this->errorResult('Not Implemented');
+        return EmptyResult::create()
+            ->setMessage('Account unsuspended');
     }
 
     public function changePackage(ChangePackageParams $params): ChangePackageResult
@@ -94,12 +100,14 @@ class Provider extends Category implements ProviderInterface
 
     public function renew(AccountIdentifierParams $params): EmptyResult
     {
-        $this->errorResult('Not Implemented');
+        return EmptyResult::create()
+            ->setMessage('Account renewed');
     }
 
     public function terminate(AccountIdentifierParams $params): EmptyResult
     {
-        $this->errorResult('Not Implemented');
+        return EmptyResult::create()
+            ->setMessage('Account renewed');
     }
 
     protected function getExtraConfigurationParams(): array
