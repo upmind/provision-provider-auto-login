@@ -110,26 +110,6 @@ class Provider extends Category implements ProviderInterface
             ->setMessage('Account renewed');
     }
 
-    protected function getExtraConfigurationParams(): array
-    {
-        $extraParams = [];
-
-        for ($i = 1; $i <= 3; $i++) {
-            $extraData = $this->configuration->{"extra_data_{$i}"};
-            $extraSecret = $this->configuration->{"extra_secret_{$i}"};
-
-            if ($extraData) {
-                $extraParams["data_{$i}"] = $extraData;
-            }
-
-            if ($extraSecret) {
-                $extraParams["secret_{$i}"] = $extraSecret;
-            }
-        }
-
-        return $extraParams;
-    }
-
     /**
      * @return no-return
      *
