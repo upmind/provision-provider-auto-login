@@ -24,7 +24,7 @@ class SiteproApi
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function createSession(string $domain, $package_identifier, $client_id): mixed
+    public function createSession(string $domain, $package_identifier, $client_id)
     {
         $publishType = $this->configuration->publish_type;
         $brandId = $this->configuration->brand_id;
