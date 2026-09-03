@@ -56,7 +56,7 @@ class SiteproApi
         ?array $params = null,
         ?array $body = null,
         string $method = 'GET'
-    ): mixed
+    )
     {
         $requestParams = [];
 
