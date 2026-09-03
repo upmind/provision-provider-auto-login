@@ -38,6 +38,8 @@ Alternatively you can start using it for your business immediately with [Upmind.
 The following providers are currently implemented:
   - Generic (a generic highly configurable provider)
   - [SpamExperts](https://api.antispamcloud.com/api/help.php)
+  - [SafeWeb](https://www.safeweb.co/)
+  - [Sitepro](https://site.pro/)
 
 ## Functions
 
