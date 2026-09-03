@@ -35,7 +35,11 @@ class Provider extends Category implements ProviderInterface
     {
         return AboutData::create()
             ->setName('Site.pro')
+<<<<<<< HEAD
             ->setLogoUrl('https://api.upmind.io/images/logos/provision/sitepro-logo.svg')
+=======
+            ->setLogoUrl('https://api.upmind.io/images/logos/provision/sitepro-logo@2x.png')
+>>>>>>> b31ac4aaa7889ec310092c11c3a750174942b6b3
             ->setDescription(
                 'Create, manage and log into Site.pro site builder accounts'
             );
