@@ -129,8 +129,9 @@ class Provider extends Category implements ProviderInterface
                 $body = trim($response === null ? '' : $response->getBody()->__toString());
                 $responseData = json_decode($body, true);
 
-                $error = $responseData['error'] ?? null;
-                $errorMessage =  $error ?? $response->getReasonPhrase();
+                $error = $responseData['error']['message'] ?? $response->getReasonPhrase();
+
+                $errorMessage = $error !== null ? $errorMessage . ': ' . $error : $errorMessage;
                 $errorData = [
                     'response_data' => $responseData
                 ];
