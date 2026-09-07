@@ -18,6 +18,20 @@ class SiteproApi
     }
 
     /**
+     * Create a session and return the SSO login URL.
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function login(AccountIdentifierParams $params)
+    {
+        $domain = $params->service_identifier;
+        $package_identifier = $params->package_identifier;
+        $client_id = $params->username;
+
+        return $this->createSession($domain, $package_identifier, $client_id);
+    }
+
+    /**
      * @param string $domain Client domain
      * @param mixed $package_identifier Builder plan identifier
      * @param mixed $client_id Client ID
@@ -43,9 +57,7 @@ class SiteproApi
             'clientId' => $client_id
         ];
 
-        $response = $this->makeRequest('requestLogin', null, $body, 'POST');
-
-        return $response;
+        return $this->makeRequest('requestLogin', null, $body, 'POST');
     }
 
     /**
@@ -56,8 +68,7 @@ class SiteproApi
         ?array $params = null,
         ?array $body = null,
         string $method = 'GET'
-    )
-    {
+    ) {
         $requestParams = [];
 
         if ($params) {
@@ -68,24 +79,12 @@ class SiteproApi
             $requestParams['body'] = json_encode($body);
         }
 
-        $response = $this->client->request($method, $command, $requestParams);
-        
-        return $response;
+        return $this->client->request($method, $this->getApiEndpointUrl($command), $requestParams);
     }
 
-    /**
-     * Create a session and return the SSO login URL.
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function login(AccountIdentifierParams $params)
+    private function getApiEndpointUrl(string $command): string
     {
-        $domain = $params->service_identifier;
-        $package_identifier = $params->package_identifier;
-        $client_id = $params->username;
-
-        $response = $this->createSession($domain, $package_identifier, $client_id);
-
-        return $response;
+        // trim `/` character in case it exists at the end of the api_url configuration value
+        return trim($this->configuration->api_url, '/') . '/' . $command;
     }
 }
