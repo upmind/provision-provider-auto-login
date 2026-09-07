@@ -2,6 +2,10 @@
 
 All notable changes to the package will be documented in this file.
 
+## [v6.3.1](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v6.3.1) - 2026-09-07
+
+- Fix Sitepro API URL
+
 ## [v6.3.0](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v6.3.0) - 2026-09-03
 
 - Add Sitepro provider
