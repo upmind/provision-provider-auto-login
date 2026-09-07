@@ -24,10 +24,7 @@ use Upmind\ProvisionProviders\AutoLogin\Providers\Sitepro\ResponseHandlers\UrlRe
 
 class Provider extends Category implements ProviderInterface
 {
-    /**
-     * @var Configuration
-     */
-    protected $configuration;
+    protected Configuration $configuration;
 
     protected ?SiteproApi $api = null;
 
@@ -151,12 +148,9 @@ class Provider extends Category implements ProviderInterface
             return $this->api;
         }
 
-        $baseUri = $this->configuration->api_url;
-
         $credentials = base64_encode("{$this->configuration->username}:{$this->configuration->password}");
 
         $client = new Client([
-            'base_uri' => $baseUri,
             RequestOptions::HEADERS => [
                 'User-Agent' => 'upmind/provision-provider-auto-login v1.0',
                 'Content-Type' => 'application/json',
