@@ -2,6 +2,10 @@
 
 All notable changes to the package will be documented in this file.
 
+## [v5.1.14](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.14) - 2026-09-07
+
+- Fix Sitepro error message handling
+
 ## [v5.1.13](https://github.com/upmind-automation/provision-provider-auto-login/releases/tag/v5.1.13) - 2026-09-07
 
 - Fix Sitepro API URL
