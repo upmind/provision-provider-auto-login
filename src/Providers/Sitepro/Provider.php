@@ -131,7 +131,7 @@ class Provider extends Category implements ProviderInterface
 
                 $error = $responseData['error']['message'] ?? $response->getReasonPhrase();
 
-                $errorMessage = $error !== null ? $errorMessage . ': ' . $error : $errorMessage;
+                $errorMessage = !empty($error) ? $errorMessage . ': ' . $error : $errorMessage;
                 $errorData = [
                     'response_data' => $responseData
                 ];
