@@ -6,7 +6,7 @@ namespace Upmind\ProvisionProviders\AutoLogin\Providers\Sitepro;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Exception\TransferException;
 use Upmind\ProvisionBase\Provider\Contract\ProviderInterface;
 use Upmind\ProvisionBase\Provider\DataSet\AboutData;
@@ -122,11 +122,11 @@ class Provider extends Category implements ProviderInterface
                 'message' => $e->getMessage(),
             ];
 
-            if (($e instanceof RequestException) && $e->hasResponse()) {
+            if ($e instanceof ResponseException) {
                 $response = $e->getResponse();
                 $errorMessage = 'Provider API Error';
 
-                $body = trim($response === null ? '' : $response->getBody()->__toString());
+                $body = trim($response->getBody()->__toString());
                 $responseData = json_decode($body, true);
 
                 $error = $responseData['error']['message'] ?? $response->getReasonPhrase();

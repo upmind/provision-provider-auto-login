@@ -4,6 +4,7 @@
 
 This provision category contains functions to facilitate basic online service account creation/management including an automatic login feature.
 
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Quick-start](#quick-start)
@@ -14,6 +15,11 @@ This provision category contains functions to facilitate basic online service ac
 - [Credits](#credits)
 - [License](#license)
 - [Upmind](#upmind)
+
+## Requirements
+
+- PHP 8.3, 8.4 or 8.5
+- [upmind/provision-provider-base](https://packagist.org/packages/upmind/provision-provider-base) v5
 
 ## Installation
 
